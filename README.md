@@ -129,4 +129,4 @@ TODO: Run these commands in a clean environment and record the results. No test 
 
 ## About the author
 
-TODO: Add the author's name, role, and contact or profile link.
+[Dunama Dahiru](https://dunama.vercel.app) — Fullstack developer
