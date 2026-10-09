@@ -1,0 +1,65 @@
+services:
+
+  db:
+
+    image: postgis/postgis:16-3.4
+
+    environment:
+
+      POSTGRES_USER: airport
+
+      POSTGRES_PASSWORD: airport
+
+      POSTGRES_DB: airport
+
+    ports:
+
+      - "5432:5432"
+
+    volumes:
+
+      - pgdata:/var/lib/postgresql/data
+
+    healthcheck:
+
+      test: ["CMD-SHELL", "pg_isready -U airport"]
+
+      interval: 5s
+
+      retries: 10
+
+  api:
+
+    build: ./apps/api
+
+    env_file: apps/api/.env
+
+    environment:
+
+      DATABASE_URL: "postgresql+asyncpg://airport:airport@db:5432/airport"
+
+    ports:
+
+      - "8000:8000"
+
+    depends_on:
+
+      db:
+
+        condition: service_healthy
+
+  redis:                      # optional, local only
+
+    image: redis:7
+
+    profiles: ["redis"]
+
+    ports:
+
+      - "6379:6379"
+
+volumes:
+
+  pgdata:
+
+# Run the frontend with npm run dev inside apps/web (it deploys to Vercel, so it does not need a container). Start the stack with docker compose up --build.
