@@ -12,7 +12,7 @@ TODO: Add a screenshot of the running application once the product UI is impleme
 
 - Serves a FastAPI health endpoint at `GET /health`.
 - Defines a `flights` database table and `Flight` SQLAlchemy model with flight identifiers, route, schedule, and status fields.
-- Runs PostgreSQL locally through Docker Compose.
+- Runs PostgreSQL and the FastAPI API locally through Docker Compose.
 - Provides a Next.js frontend development shell at `http://localhost:3000`.
 
 ## Status
@@ -65,19 +65,21 @@ The repository contains `docker-compose.yaml` (not `docker-compose.yml`).
 
 ### Setup and start
 
-From a fresh clone, run these PowerShell commands one per line:
+From a fresh clone, create `apps/api/.env` from `.env.example` and fill in the required settings. Then run these PowerShell commands from the repository root:
 
 ```powershell
 Copy-Item .env.example apps/api/.env
 Add-Content -Path apps/api/.env -Value @("JWT_ALGORITHM=HS256", "ACCESS_TOKEN_MINUTES=30", "REFRESH_TOKEN_MINUTES=10080")
 docker compose up -d db
-Set-Location apps/api
-uv sync
-uv run alembic upgrade head
-uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+docker compose ps
+docker compose exec db psql -U airport -d airport -c "CREATE EXTENSION IF NOT EXISTS btree_gist;"
+docker compose run --rm api alembic upgrade head
+docker compose up -d --build api
 ```
 
-In a second PowerShell window, from the repository root:
+The API container uses the Compose hostname `db` for PostgreSQL. The `btree_gist` extension is required by the gate assignment exclusion constraint. `docker compose up -d --build` starts the database and API, but it does not run migrations automatically.
+
+The frontend runs locally. In a second PowerShell window, from the repository root:
 
 ```powershell
 Set-Location apps/web
@@ -85,9 +87,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) for the frontend and [http://localhost:8000/health](http://localhost:8000/health) for the API health response.
-
-The command sequence is derived from the checked-in Compose, environment, Python, and frontend configuration. It has not been verified from a fresh clone in this environment. The extra `Add-Content` command is required because the current `.env.example` does not define `JWT_ALGORITHM`, `ACCESS_TOKEN_MINUTES`, or `REFRESH_TOKEN_MINUTES`, although the API settings require them.
+Open [http://localhost:3000](http://localhost:3000) for the frontend, [http://localhost:8000/health](http://localhost:8000/health) for the API health response, and [http://localhost:8000/docs](http://localhost:8000/docs) for the API documentation.
 
 ## Tests and results
 
