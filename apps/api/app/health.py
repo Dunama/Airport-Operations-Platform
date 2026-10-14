@@ -13,4 +13,6 @@ def health() -> dict[str, str]:
 
     # 100 CU-hours/month compute allowance.
 
-    return {"status": "ok"}
+    return {"status": "ok",
+            "message": "API is healthy and ready to serve requests."
+            }
