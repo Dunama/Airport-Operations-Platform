@@ -27,6 +27,18 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-status-critical: var(--status-critical);
+  --color-status-critical-soft: var(--status-critical-soft);
+  --color-status-critical-bright: var(--status-critical-bright);
+  --color-status-ok: var(--status-ok);
+  --color-status-ok-soft: var(--status-ok-soft);
+  --color-status-ok-bright: var(--status-ok-bright);
+  --color-status-pending: var(--status-pending);
+  --color-status-pending-soft: var(--status-pending-soft);
+  --color-status-pending-bright: var(--status-pending-bright);
+  --color-status-neutral: var(--status-neutral);
+  --color-status-neutral-soft: var(--status-neutral-soft);
+  --color-status-neutral-bright: var(--status-neutral-bright);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -49,82 +61,216 @@
 }
 
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  color-scheme: light;
+  /*
+   * Light theme: the same blue family as the dark navy board, flipped.
+   * A faintly blue-tinted page sits a clear step below pure-white cards so
+   * surfaces lift off the background, and all text is deep navy rather than
+   * grey — high contrast (WCAG AA+) so it stays easy to read for every age
+   * group and in bright terminal / apron lighting.
+   */
+  --background: oklch(0.963 0.014 255);
+  --foreground: oklch(0.2 0.06 265);
+  --card: oklch(0.995 0.003 255);
+  --card-foreground: oklch(0.2 0.06 265);
+  --popover: oklch(0.995 0.003 255);
+  --popover-foreground: oklch(0.2 0.06 265);
+  /* Primary: strong royal blue — white text on it passes AA comfortably. */
+  --primary: oklch(0.5 0.21 264);
+  --primary-foreground: oklch(0.985 0.005 255);
+  --secondary: oklch(0.925 0.025 258);
+  --secondary-foreground: oklch(0.26 0.08 265);
+  --muted: oklch(0.935 0.02 258);
+  --muted-foreground: oklch(0.45 0.06 265);
+  --accent: oklch(0.9 0.05 260);
+  --accent-foreground: oklch(0.3 0.12 265);
+  --destructive: oklch(0.52 0.19 25);
+  --border: oklch(0.87 0.03 260);
+  --input: oklch(0.84 0.035 260);
+  --ring: oklch(0.58 0.2 264);
+  /* Chart colors reuse the status palette — color always means state */
+  --chart-1: oklch(0.53 0.13 155);
+  --chart-2: oklch(0.55 0.13 75);
+  --chart-3: oklch(0.52 0.19 25);
+  --chart-4: oklch(0.5 0.21 264);
+  --chart-5: oklch(0.3 0.08 265);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Light sidebar is a near-white panel, not a tinted blue one. */
+  --sidebar: oklch(0.992 0.004 255);
+  --sidebar-foreground: oklch(0.2 0.06 265);
+  --sidebar-primary: oklch(0.5 0.21 264);
+  --sidebar-primary-foreground: oklch(0.985 0.005 255);
+  --sidebar-accent: oklch(0.935 0.04 260);
+  --sidebar-accent-foreground: oklch(0.3 0.12 265);
+  --sidebar-border: oklch(0.88 0.028 260);
+  --sidebar-ring: oklch(0.58 0.2 264);
+  --backdrop: radial-gradient(60rem 28rem at 85% -8%, oklch(0.85 0.08 258 / 0.55), transparent 70%);
+
+  /*
+   * Status contract — red = danger, green = done/on-track, yellow = pending,
+   * blue-slate = neutral info. `soft` is chip/row backgrounds, `bright` is
+   * decorative fill (bars, dots at large size). Base tone passes WCAG AA
+   * as text on both --background and the soft tokens.
+   */
+  --status-critical: oklch(0.52 0.19 25);
+  --status-critical-soft: oklch(0.95 0.025 25);
+  --status-critical-bright: oklch(0.72 0.17 25);
+  --status-ok: oklch(0.5 0.13 155);
+  --status-ok-soft: oklch(0.95 0.03 155);
+  --status-ok-bright: oklch(0.75 0.15 155);
+  --status-pending: oklch(0.53 0.13 75);
+  --status-pending-soft: oklch(0.96 0.04 85);
+  --status-pending-bright: oklch(0.82 0.15 85);
+  --status-neutral: oklch(0.46 0.07 265);
+  --status-neutral-soft: oklch(0.93 0.02 258);
+  --status-neutral-bright: oklch(0.72 0.05 262);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  color-scheme: dark;
+  /* Deep navy board: layered blues, brighter surfaces = closer to the user. */
+  --background: oklch(0.2 0.07 265);
+  --foreground: oklch(0.97 0.012 258);
+  --card: oklch(0.255 0.095 265);
+  --card-foreground: oklch(0.97 0.012 258);
+  --popover: oklch(0.265 0.095 265);
+  --popover-foreground: oklch(0.97 0.012 258);
+  --primary: oklch(0.6 0.21 263);
+  --primary-foreground: oklch(0.99 0.004 258);
+  --secondary: oklch(0.3 0.1 265);
+  --secondary-foreground: oklch(0.96 0.015 258);
+  --muted: oklch(0.3 0.09 265);
+  --muted-foreground: oklch(0.76 0.06 262);
+  --accent: oklch(0.34 0.13 265);
+  --accent-foreground: oklch(0.92 0.05 260);
+  --destructive: oklch(0.7 0.17 25);
+  --border: oklch(0.5 0.12 265 / 38%);
+  --input: oklch(0.55 0.12 265 / 42%);
+  --ring: oklch(0.68 0.19 263);
+  --chart-1: oklch(0.75 0.15 155);
+  --chart-2: oklch(0.82 0.15 85);
+  --chart-3: oklch(0.72 0.17 25);
+  --chart-4: oklch(0.7 0.17 262);
+  --chart-5: oklch(0.93 0.02 258);
+  --sidebar: oklch(0.17 0.065 265);
+  --sidebar-foreground: oklch(0.97 0.012 258);
+  --sidebar-primary: oklch(0.6 0.21 263);
+  --sidebar-primary-foreground: oklch(0.99 0.004 258);
+  --sidebar-accent: oklch(0.3 0.12 265);
+  --sidebar-accent-foreground: oklch(0.93 0.05 260);
+  --sidebar-border: oklch(0.5 0.12 265 / 32%);
+  --sidebar-ring: oklch(0.68 0.19 263);
+  --backdrop: radial-gradient(60rem 28rem at 85% -8%, oklch(0.42 0.17 265 / 0.45), transparent 70%);
+
+  --status-critical: oklch(0.74 0.16 25);
+  --status-critical-soft: oklch(0.32 0.08 25);
+  --status-critical-bright: oklch(0.78 0.16 25);
+  --status-ok: oklch(0.78 0.15 155);
+  --status-ok-soft: oklch(0.31 0.07 155);
+  --status-ok-bright: oklch(0.82 0.14 155);
+  --status-pending: oklch(0.84 0.14 85);
+  --status-pending-soft: oklch(0.34 0.07 85);
+  --status-pending-bright: oklch(0.86 0.14 85);
+  --status-neutral: oklch(0.8 0.06 262);
+  --status-neutral-soft: oklch(0.32 0.09 265);
+  --status-neutral-bright: oklch(0.82 0.06 262);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
+  /*
+   * `rem` resolves against <html>, not <body> — and nearly every element in
+   * this app sets its own size via a Tailwind text-* utility (also rem),
+   * so a font-size set on body alone is overridden almost everywhere and
+   * has no real effect. Scaling the root instead scales every rem-based
+   * text size AND spacing value together, consistently, site-wide.
+   */
   html {
     @apply font-sans;
+    font-size: 112.5%;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image: var(--backdrop);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+  }
+}
+
+/*
+ * Plane loader: the plane drifts in, banks gently while the "engines spool",
+ * then accelerates straight up and out of frame. Distances are percentages
+ * of the plane's own size, so one keyframe set works at every loader size.
+ */
+@keyframes aop-plane-flight {
+  0% {
+    transform: translateY(140%) scale(0.7);
+    opacity: 0;
+  }
+  18% {
+    transform: translateY(15%) scale(0.95) rotate(-3deg);
+    opacity: 1;
+  }
+  40% {
+    transform: translateY(-4%) scale(1) rotate(3deg);
+  }
+  58% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45);
+  }
+  100% {
+    transform: translateY(-420%) scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes aop-plane-trail {
+  0%,
+  56% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  72% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: scaleY(1);
+    opacity: 0;
+  }
+}
+
+@keyframes aop-plane-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  55% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
+}
+
+.aop-plane {
+  animation: aop-plane-flight 2.6s ease-in-out infinite;
+}
+.aop-plane-trail {
+  transform-origin: top;
+  animation: aop-plane-trail 2.6s ease-in infinite;
+}
+.aop-plane-glow {
+  animation: aop-plane-glow 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aop-plane,
+  .aop-plane-trail {
+    animation: none;
+  }
+  .aop-plane-trail {
+    opacity: 0;
   }
 }

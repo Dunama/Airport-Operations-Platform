@@ -13,6 +13,14 @@ class UserOut(BaseModel):
 
     model_config = {"from_attributes": True}
 
+class MeOut(BaseModel):
+    id: int
+    email: str
+    role: str
+    airline_id: int
+    is_active: bool
+
+
 class TokenOut(BaseModel):
     access_token: str
     token_type: str

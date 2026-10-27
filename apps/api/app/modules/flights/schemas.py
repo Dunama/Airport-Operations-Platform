@@ -7,7 +7,6 @@ from app.core.schemas import Schema
 
 
 class FlightBase(Schema):
-    rotation_id: int
     airline_id: int
     origin_id: int
     dest_id: int
@@ -21,11 +20,32 @@ class FlightBase(Schema):
 
 
 class FlightCreate(FlightBase):
-    pass
+    """Create a movement.
+
+    Either attach it to an existing ``rotation_id`` or supply an
+    ``aircraft_id`` and the API will create a rotation (and its turnaround)
+    automatically.
+    """
+
+    rotation_id: int | None = None
+    aircraft_id: int | None = None
+
+
+class FlightUpdate(Schema):
+    airline_id: int | None = None
+    origin_id: int | None = None
+    dest_id: int | None = None
+    flight_no: str | None = Field(default=None, min_length=1, max_length=20)
+    direction: str | None = Field(default=None, pattern="^(ARR|DEP|IN|OUT)$")
+    sched_time: datetime | None = None
+    est_time: datetime | None = None
+    actual_time: datetime | None = None
+    status: str | None = Field(default=None, min_length=1, max_length=20)
 
 
 class FlightRead(FlightBase):
     id: int
+    rotation_id: int
 
 
 class FlightEventBase(Schema):

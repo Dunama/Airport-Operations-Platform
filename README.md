@@ -22,7 +22,7 @@ TODO: Add a screenshot of the running application once the product UI is impleme
 - [x] PostgreSQL Docker service and Alembic migration setup.
 - [x] Initial flight model and migration.
 - [x] Next.js frontend scaffold.
-- [ ] Wire the flights router into the FastAPI application.
+- [ ] Wire the routes into the FastAPI application.
 - [ ] Build the airport operations UI and connect it to the API.
 - [ ] Implement gate allocation with Google OR-Tools.
 - [ ] Add a simulator and realtime update channel.

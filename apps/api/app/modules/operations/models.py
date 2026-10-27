@@ -28,6 +28,8 @@ class Turnarounds(Base):
     aobt: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     atot: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     predicted_ready: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # Estimated landing time derived from live ADS-B (OpenSky); superseded by aldt.
+    predicted_aldt: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
 class Passengers(Base):

@@ -1,16 +1,31 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.crud import CrudService
 from app.core.db import get_session
 from app.modules.auth.models import User
 from app.modules.auth.router import get_current_user, require_role
-from app.modules.flights.models import Flights
-from app.modules.flights.schemas import FlightCreate, FlightRead
+from app.modules.flights.models import DelayPredictions, FlightEvents, Flights
+from app.modules.flights.schemas import (
+    DelayPredictionCreate,
+    DelayPredictionRead,
+    FlightCreate,
+    FlightEventCreate,
+    FlightEventRead,
+    FlightRead,
+    FlightUpdate,
+)
 from app.modules.flights.service import FlightService
 
 
 router = APIRouter()
-flight_service = FlightService(Flights)
+event_router = APIRouter()
+delay_prediction_router = APIRouter()
+
+flight_service = FlightService(Flights, entity="flight")
+flight_event_service = CrudService(FlightEvents, entity="flight event")
+delay_prediction_service = CrudService(DelayPredictions, entity="delay prediction")
 
 
 @router.get("", response_model=list[FlightRead])
@@ -36,7 +51,9 @@ async def create_flight(
     session: AsyncSession = Depends(get_session),
     current_user: User = Depends(require_role("admin", "ops")),
 ):
-    return await flight_service.create(session, payload.model_dump())
+    return await flight_service.create_movement(
+        session, payload.model_dump(exclude_unset=True)
+    )
 
 
 @router.get("/{flight_id}", response_model=FlightRead)
@@ -55,6 +72,18 @@ async def get_flight(
     return flight
 
 
+@router.put("/{flight_id}", response_model=FlightRead)
+async def update_flight(
+    flight_id: int,
+    payload: FlightUpdate,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(require_role("admin", "ops")),
+):
+    return await flight_service.update_movement(
+        session, flight_id, payload.model_dump(exclude_unset=True)
+    )
+
+
 @router.delete("/{flight_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_flight(
     flight_id: int,
@@ -63,3 +92,52 @@ async def delete_flight(
 ):
     await flight_service.delete(session, flight_id)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@event_router.get("", response_model=list[FlightEventRead])
+async def list_flight_events(
+    flight_id: int | None = Query(default=None),
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=500),
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    stmt = select(FlightEvents).offset(offset).limit(limit)
+    if flight_id is not None:
+        stmt = stmt.where(FlightEvents.flight_id == flight_id)
+    return list((await session.scalars(stmt)).all())
+
+
+@event_router.post("", response_model=FlightEventRead, status_code=status.HTTP_201_CREATED)
+async def create_flight_event(
+    payload: FlightEventCreate,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(require_role("ground", "ops", "admin")),
+):
+    return await flight_event_service.create(session, payload.model_dump())
+
+
+@delay_prediction_router.get("", response_model=list[DelayPredictionRead])
+async def list_delay_predictions(
+    flight_id: int | None = Query(default=None),
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=100, ge=1, le=500),
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(get_current_user),
+):
+    stmt = select(DelayPredictions).offset(offset).limit(limit)
+    if flight_id is not None:
+        stmt = stmt.where(DelayPredictions.flight_id == flight_id)
+    return list((await session.scalars(stmt)).all())
+    
+
+
+@delay_prediction_router.post(
+    "", response_model=DelayPredictionRead, status_code=status.HTTP_201_CREATED
+)
+async def create_delay_prediction(
+    payload: DelayPredictionCreate,
+    session: AsyncSession = Depends(get_session),
+    current_user: User = Depends(require_role("admin", "ops")),
+):
+    return await delay_prediction_service.create(session, payload.model_dump())

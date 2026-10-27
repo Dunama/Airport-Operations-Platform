@@ -12,6 +12,7 @@ from app.core.db import Base
 # Import every models file so its tables register on Base.metadata.
 # Alembic only "sees" tables whose models have been imported here.
 from app.modules.flights import models as flights_models  # noqa: F401
+from app.modules.activity import models as activity_models  # noqa: F401
 
 config = context.config
 
